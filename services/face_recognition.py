@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 from insightface.app import FaceAnalysis
@@ -8,19 +9,37 @@ class FaceRecognitionService:
     def __init__(self, threshold=0.39):
 
         self.threshold = threshold
+        self._app = None  # Lazy-loaded
 
-        self.app = FaceAnalysis(
-            name="buffalo_l",
-            providers=[
-                "CUDAExecutionProvider",
-                "CPUExecutionProvider"
-            ]
-        )
+        # Use environment variables for deployment flexibility
+        self._model_name = os.environ.get("FACE_MODEL", "buffalo_s")
+        self._det_size = int(os.environ.get("DET_SIZE", "320"))
 
-        self.app.prepare(
-            ctx_id=0,
-            det_size=(640, 640)
-        )
+    @property
+    def app(self):
+        """Lazy-load the model on first use to reduce startup memory spike."""
+        if self._app is None:
+            # Limit ONNX threads to reduce memory
+            os.environ["OMP_NUM_THREADS"] = "1"
+            os.environ["OPENBLAS_NUM_THREADS"] = "1"
+            os.environ["MKL_NUM_THREADS"] = "1"
+
+            import onnxruntime
+            sess_options = onnxruntime.SessionOptions()
+            sess_options.intra_op_num_threads = 1
+            sess_options.inter_op_num_threads = 1
+
+            self._app = FaceAnalysis(
+                name=self._model_name,
+                providers=["CPUExecutionProvider"],
+                allowed_modules=["detection", "recognition"]
+            )
+
+            self._app.prepare(
+                ctx_id=-1,
+                det_size=(self._det_size, self._det_size)
+            )
+        return self._app
 
     def get_embedding(self, image):
         """
