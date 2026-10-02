@@ -4,7 +4,7 @@ services:
     runtime: python
     buildCommand: |
       pip install --no-cache-dir -r requirements.txt &&
-      pip uninstall -y opencv-python scikit-image networkx imageio tifffile lazy-loader scikit-learn scipy ml-dtypes Pygments onnx 2>/dev/null || true
+      pip install --no-cache-dir --no-deps insightface==2.0
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --limit-max-requests 1000
     envVars:
       - key: PYTHON_VERSION
@@ -23,5 +23,3 @@ services:
         value: "2"
       - key: PYTHONUNBUFFERED
         value: "1"
-      - key: MPLBACKEND
-        value: "Agg"

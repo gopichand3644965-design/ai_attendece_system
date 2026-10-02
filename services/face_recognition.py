@@ -20,6 +20,10 @@ class FaceRecognitionService:
         if self._app is not None:
             return
 
+        # Install lightweight replacements for heavy deps BEFORE importing insightface
+        from utils.lightweight_deps import install as install_mocks
+        install_mocks()
+
         # Limit ONNX Runtime threads to reduce memory
         os.environ.setdefault("OMP_NUM_THREADS", "1")
         os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
@@ -27,12 +31,6 @@ class FaceRecognitionService:
 
         import onnxruntime
         onnxruntime.set_default_logger_severity(3)  # Suppress warnings
-
-        # Set ONNX session options for low memory
-        sess_options = onnxruntime.SessionOptions()
-        sess_options.intra_op_num_threads = 1
-        sess_options.inter_op_num_threads = 1
-        sess_options.execution_mode = onnxruntime.ExecutionMode.ORT_SEQUENTIAL
 
         from insightface.app import FaceAnalysis
 
