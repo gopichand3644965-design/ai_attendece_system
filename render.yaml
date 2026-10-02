@@ -4,7 +4,7 @@ services:
     runtime: python
     buildCommand: |
       pip install --no-cache-dir -r requirements.txt &&
-      pip install --no-cache-dir --no-deps insightface==2.0 &&
+      pip install --no-cache-dir --no-deps insightface==2.0 onnx &&
       python -c "from utils.lightweight_deps import install as install_mocks; install_mocks(); import os; os.environ['OMP_NUM_THREADS'] = '1'; from insightface.app import FaceAnalysis; app = FaceAnalysis(name='buffalo_s', root='./model_cache', allowed_modules=['detection', 'recognition']); app.prepare(ctx_id=-1, det_size=(320, 320))"
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --limit-max-requests 1000
     envVars:
