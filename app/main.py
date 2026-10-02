@@ -1,3 +1,12 @@
+import os
+import gc
+
+# Set memory-limiting environment variables early, before any imports
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("MALLOC_ARENA_MAX", "2")
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -20,7 +29,7 @@ from services.settings_service import SettingsService
 scheduler = BackgroundScheduler()
 
 
-# ── App ──────────────────────────────────────────────────
+# 🔧 App 🔧
 
 app = FastAPI(
     title="AI Attendance System",
@@ -29,7 +38,8 @@ app = FastAPI(
 )
 
 
-# ── Service Initialization ───────────────────────────────
+# 🔧 Service Initialization 🔧
+# Face model uses lazy loading — it won't consume memory until first face recognition request
 
 face_model = FaceRecognitionService()
 
@@ -50,7 +60,7 @@ attendance_processor = AttendanceProcessor(
 )
 
 
-# ── Routers ──────────────────────────────────────────────
+# 🔧 Routers 🔧
 
 app.include_router(students_router)
 app.include_router(attendance_router)
@@ -59,13 +69,12 @@ app.include_router(database_router)
 app.include_router(settings_router)
 
 
-# ── Static Files ─────────────────────────────────────────
+# 🔧 Static Files 🔧
 
-import os
 if os.path.exists("static"):
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# ── Background Scheduler ─────────────────────────────────
+# 🔧 Background Scheduler 🔧
 
 def run_absent_job():
     print("Running auto-absent job...")
@@ -99,12 +108,15 @@ def schedule_auto_absent_job():
 def startup_event():
     schedule_auto_absent_job()
     scheduler.start()
+    # Force garbage collection after startup
+    gc.collect()
+    print("App started. Face model will load lazily on first recognition request.")
 
 @app.on_event("shutdown")
 def shutdown_event():
     scheduler.shutdown()
 
-# ── Root Endpoints ───────────────────────────────────────
+# 🔧 Root Endpoints 🔧
 
 @app.get("/", tags=["System"])
 def home():
@@ -132,7 +144,7 @@ def health():
     }
 
 
-# ── Entry Point ──────────────────────────────────────────
+# 🔧 Entry Point 🔧
 
 if __name__ == "__main__":
     import uvicorn

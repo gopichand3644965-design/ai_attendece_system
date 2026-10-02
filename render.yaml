@@ -2,8 +2,10 @@ services:
   - type: web
     name: ai-attendance-system
     runtime: python
-    buildCommand: pip install --no-cache-dir -r requirements.txt && pip uninstall -y opencv-python scikit-image networkx imageio tifffile lazy-loader
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: |
+      pip install --no-cache-dir -r requirements.txt &&
+      pip uninstall -y opencv-python scikit-image networkx imageio tifffile lazy-loader scikit-learn scipy ml-dtypes Pygments onnx 2>/dev/null || true
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --limit-max-requests 1000
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.10"
@@ -19,3 +21,7 @@ services:
         value: "1"
       - key: MALLOC_ARENA_MAX
         value: "2"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: MPLBACKEND
+        value: "Agg"

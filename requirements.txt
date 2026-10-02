@@ -14,9 +14,7 @@ httpx==0.28.1
 idna==3.20
 insightface==2.0
 joblib==1.6.0
-ml_dtypes==0.6.0
 numpy==2.5.3
-onnx==1.23.1
 onnxruntime==1.30.0
 opencv-python-headless==4.10.0.84
 packaging==26.3
@@ -28,8 +26,6 @@ pydantic_core==2.46.5
 pymongo==4.18.2
 python-multipart==0.0.32
 requests==2.34.2
-scikit-learn==1.9.1
-scipy==1.18.1
 starlette==1.7.0
 threadpoolctl==3.7.0
 tqdm==4.70.1

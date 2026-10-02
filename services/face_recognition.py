@@ -1,7 +1,7 @@
 import os
+import gc
 import cv2
 import numpy as np
-from insightface.app import FaceAnalysis
 
 
 class FaceRecognitionService:
@@ -9,36 +9,56 @@ class FaceRecognitionService:
     def __init__(self, threshold=0.39):
 
         self.threshold = threshold
-        self._app = None  # Lazy-loaded
 
-        # Use environment variables for deployment flexibility
+        # Lazy loading: model is loaded on first use, not at startup
+        self._app = None
         self._model_name = os.environ.get("FACE_MODEL", "buffalo_s")
         self._det_size = int(os.environ.get("DET_SIZE", "320"))
 
+    def _load_model(self):
+        """Load the InsightFace model lazily on first use."""
+        if self._app is not None:
+            return
+
+        # Limit ONNX Runtime threads to reduce memory
+        os.environ.setdefault("OMP_NUM_THREADS", "1")
+        os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+        os.environ.setdefault("MKL_NUM_THREADS", "1")
+
+        import onnxruntime
+        onnxruntime.set_default_logger_severity(3)  # Suppress warnings
+
+        # Set ONNX session options for low memory
+        sess_options = onnxruntime.SessionOptions()
+        sess_options.intra_op_num_threads = 1
+        sess_options.inter_op_num_threads = 1
+        sess_options.execution_mode = onnxruntime.ExecutionMode.ORT_SEQUENTIAL
+
+        from insightface.app import FaceAnalysis
+
+        print(f"Loading face model: {self._model_name} (det_size={self._det_size})")
+
+        self._app = FaceAnalysis(
+            name=self._model_name,
+            # Only load detection + recognition (skip age/gender/landmark to save memory)
+            allowed_modules=["detection", "recognition"],
+            providers=["CPUExecutionProvider"]
+        )
+
+        self._app.prepare(
+            ctx_id=-1,  # CPU only
+            det_size=(self._det_size, self._det_size)
+        )
+
+        # Force garbage collection after model loading
+        gc.collect()
+
+        print(f"Face model loaded successfully (model={self._model_name})")
+
     @property
     def app(self):
-        """Lazy-load the model on first use to reduce startup memory spike."""
-        if self._app is None:
-            # Limit ONNX threads to reduce memory
-            os.environ["OMP_NUM_THREADS"] = "1"
-            os.environ["OPENBLAS_NUM_THREADS"] = "1"
-            os.environ["MKL_NUM_THREADS"] = "1"
-
-            import onnxruntime
-            sess_options = onnxruntime.SessionOptions()
-            sess_options.intra_op_num_threads = 1
-            sess_options.inter_op_num_threads = 1
-
-            self._app = FaceAnalysis(
-                name=self._model_name,
-                providers=["CPUExecutionProvider"],
-                allowed_modules=["detection", "recognition"]
-            )
-
-            self._app.prepare(
-                ctx_id=-1,
-                det_size=(self._det_size, self._det_size)
-            )
+        """Access the model, loading it lazily if needed."""
+        self._load_model()
         return self._app
 
     def get_embedding(self, image):
