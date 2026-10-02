@@ -29,7 +29,22 @@ class FaceRecognitionService:
         os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
         os.environ.setdefault("MKL_NUM_THREADS", "1")
 
+        # Optimize ONNX Runtime for low memory environments (512MB limit)
         import onnxruntime
+        
+        # Monkey patch InferenceSession to force low-memory options
+        original_init = onnxruntime.InferenceSession.__init__
+        
+        def patched_init(self, path_or_bytes, sess_options=None, providers=None, provider_options=None, **kwargs):
+            if sess_options is None:
+                sess_options = onnxruntime.SessionOptions()
+            sess_options.enable_mem_pattern = False
+            sess_options.enable_cpu_mem_arena = False
+            sess_options.intra_op_num_threads = 1
+            sess_options.inter_op_num_threads = 1
+            original_init(self, path_or_bytes, sess_options, providers, provider_options, **kwargs)
+            
+        onnxruntime.InferenceSession.__init__ = patched_init
         onnxruntime.set_default_logger_severity(3)  # Suppress warnings
 
         from insightface.app import FaceAnalysis
@@ -38,6 +53,7 @@ class FaceRecognitionService:
 
         self._app = FaceAnalysis(
             name=self._model_name,
+            root="./model_cache",  # Store model in project directory so Render preserves it
             # Only load detection + recognition (skip age/gender/landmark to save memory)
             allowed_modules=["detection", "recognition"],
             providers=["CPUExecutionProvider"]
