@@ -142,14 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     startMonitorBtn.addEventListener("click", () => {
-        // Validate Time Window
-        const now = new Date();
-        const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-        
-        if (currentTime < appSettings.attendance_start_time || currentTime > appSettings.attendance_end_time) {
-            alert(`Live attendance is currently closed.\nAllowed window: ${appSettings.attendance_start_time} to ${appSettings.attendance_end_time}`);
-            return;
-        }
 
         isMonitoring = true;
         startMonitorBtn.classList.add("hidden");

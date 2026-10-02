@@ -7,9 +7,10 @@ os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
 os.environ.setdefault("MKL_NUM_THREADS", "1")
 os.environ.setdefault("MALLOC_ARENA_MAX", "2")
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+import traceback
 
 from services.face_recognition import FaceRecognitionService
 from database.manager import DatabaseManager
@@ -115,6 +116,15 @@ def startup_event():
 @app.on_event("shutdown")
 def shutdown_event():
     scheduler.shutdown()
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    error_msg = f"Unhandled Exception: {str(exc)}\n{traceback.format_exc()}"
+    print(error_msg)
+    return JSONResponse(
+        status_code=500,
+        content={"success": False, "message": "Internal Server Error", "detail": error_msg}
+    )
 
 # 🔧 Root Endpoints 🔧
 
