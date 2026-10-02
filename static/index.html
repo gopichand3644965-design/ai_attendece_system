@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Attendance System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="background-mesh"></div>
+    
+    <div class="container">
+        <header>
+            <h1>AI Attendance System</h1>
+            <p>Real-time Facial Recognition & Registration</p>
+        </header>
+
+        <main>
+            <div class="camera-section glass-panel">
+                <div class="video-container">
+                    <video id="webcam" autoplay playsinline></video>
+                    <div id="scanning-overlay" class="scanning-overlay hidden">
+                        <div class="scan-line"></div>
+                        <p class="scan-text">Scanning face...</p>
+                    </div>
+                </div>
+                <canvas id="snapshot-canvas" style="display: none;"></canvas>
+                
+                <div class="controls">
+                    <button id="start-camera-btn" class="btn primary-btn">Enable Camera</button>
+                </div>
+            </div>
+
+            <div class="tabs-section">
+                <div class="tab-headers">
+                    <button class="tab-btn active" data-target="attendance-tab">Live Attendance</button>
+                    <button class="tab-btn" data-target="registration-tab">Register Student</button>
+                    <button class="tab-btn" data-target="settings-tab">Settings</button>
+                </div>
+
+                <div class="tab-content glass-panel">
+                    <!-- Live Attendance Tab -->
+                    <div id="attendance-tab" class="tab-pane active">
+                        <h2>Live Monitoring</h2>
+                        <p>Start the live attendance monitor to automatically recognize faces and mark attendance.</p>
+                        
+                        <div class="action-buttons">
+                            <button id="start-monitor-btn" class="btn success-btn" disabled>Start Monitoring</button>
+                            <button id="stop-monitor-btn" class="btn danger-btn hidden">Stop Monitoring</button>
+                        </div>
+                        
+                        <div id="attendance-result" class="result-box">
+                            Waiting for camera...
+                        </div>
+                    </div>
+
+                    <!-- Registration Tab -->
+                    <div id="registration-tab" class="tab-pane">
+                        <h2>Register New Face</h2>
+                        <p>Enter the student details and capture their face.</p>
+                        
+                        <form id="register-form" onsubmit="event.preventDefault();">
+                            <div class="input-group">
+                                <label for="student-id">Student ID</label>
+                                <input type="text" id="student-id" required placeholder="e.g. STU001">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="student-name">Full Name</label>
+                                <input type="text" id="student-name" required placeholder="e.g. John Doe">
+                            </div>
+                            
+                            <button id="capture-register-btn" class="btn primary-btn" disabled>Capture & Register</button>
+                        </form>
+                        
+                        <div id="register-result" class="result-box">
+                            Fill in details and ensure camera is on.
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div id="settings-tab" class="tab-pane">
+                        <h2>System Settings</h2>
+                        <p>Configure the valid time window for attendance. Anyone missing after the end time will be marked absent.</p>
+                        
+                        <form id="settings-form" onsubmit="event.preventDefault();">
+                            <div class="input-group">
+                                <label for="start-time">Attendance Start Time</label>
+                                <input type="time" id="start-time" required>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="end-time">Attendance End Time (Auto-Absent Trigger)</label>
+                                <input type="time" id="end-time" required>
+                            </div>
+                            
+                            <button id="save-settings-btn" class="btn primary-btn">Save Settings</button>
+                        </form>
+                        
+                        <div id="settings-result" class="result-box">
+                            Current settings loaded.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

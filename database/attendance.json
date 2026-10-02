@@ -1,0 +1,37 @@
+[
+    {
+        "student_id": "STU001",
+        "name": "Ajay",
+        "date": "2026-10-02",
+        "time": "00:42:53",
+        "status": "Present"
+    },
+    {
+        "student_id": "STU002",
+        "name": "Bablu",
+        "date": "2026-10-02",
+        "time": "00:44:31",
+        "status": "Present"
+    },
+    {
+        "student_id": "STU003",
+        "name": "Heman",
+        "date": "2026-10-02",
+        "time": "00:44:32",
+        "status": "Present"
+    },
+    {
+        "student_id": "02",
+        "name": "john",
+        "date": "2026-10-02",
+        "time": "02:27:35",
+        "status": "Present"
+    },
+    {
+        "student_id": "1",
+        "name": "gopigandu",
+        "date": "2026-10-02",
+        "time": "02:28:04",
+        "status": "Present"
+    }
+]
