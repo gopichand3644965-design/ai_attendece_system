@@ -129,7 +129,11 @@ document.addEventListener("DOMContentLoaded", () => {
             
         } catch (err) {
             console.error("Camera error:", err);
-            alert("Failed to access webcam. Please allow permissions.");
+            if (window.isSecureContext === false) {
+                alert("Failed to access webcam. Modern browsers require a secure connection (HTTPS) or localhost to access the camera. You are currently on HTTP.");
+            } else {
+                alert("Failed to access webcam. Please allow camera permissions in your browser settings.");
+            }
         }
     }
 
