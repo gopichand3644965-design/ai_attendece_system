@@ -1,0 +1,40 @@
+# .ebignore - Controls what files are excluded from EB deployment bundles
+# This file is used by the EB CLI (`eb deploy`). GitHub Actions uses the zip exclusions in deploy.yml.
+
+# Version control
+.git/
+.github/
+.gitignore
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Large model archives (individual .onnx files in model_cache ARE needed)
+recognition/
+recognition.zip
+*.whl
+
+# Local database files
+database/students.json
+database/attendance.json
+
+# Test files
+tests/
+dummy_img.jpg
+real_face.jpg
+temp_live_app.js
+e2e_test_script.py
+
+# Other platform configs
+render.yaml
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Scratch
+scratch/
