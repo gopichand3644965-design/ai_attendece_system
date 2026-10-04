@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 import traceback
+from fastapi.middleware.cors import CORSMiddleware
 
 from services.face_recognition import FaceRecognitionService
 from database.manager import DatabaseManager
@@ -36,6 +37,19 @@ app = FastAPI(
     title="AI Attendance System",
     description="AI-powered student attendance system using face recognition (InsightFace / ArcFace)",
     version="1.0.0"
+)
+
+# 🔧 CORS Configuration 🔧
+# Allows cross-origin requests when frontend is on a different domain (e.g. Vercel)
+cors_origins_env = os.environ.get("CORS_ORIGINS", "*")
+cors_origins = [o.strip() for o in cors_origins_env.split(",")]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

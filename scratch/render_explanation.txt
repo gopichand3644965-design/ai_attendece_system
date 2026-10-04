@@ -1,0 +1,5 @@
+// Explanation artifact for network error
+// Render free tier instances spin down after 15 minutes of inactivity.
+// When you make the first request (like saving settings or making attendance), 
+// it takes 30-60 seconds for the server to wake up.
+// Because the frontend doesn't wait that long by default, it throws a "Network error".

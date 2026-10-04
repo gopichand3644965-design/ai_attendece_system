@@ -153,3 +153,29 @@ class JSONAdapter(DatabaseAdapter):
 
     def get_student_attendance(self, student_id: str) -> List[Dict[str, Any]]:
         return [r for r in self.attendance if r.get("student_id") == student_id]
+
+    # -- Settings Operations --
+
+    def get_settings(self) -> dict:
+        settings_file = os.path.join(self.data_dir, "app_settings.json")
+        defaults = {
+            "attendance_start_time": "08:00",
+            "attendance_end_time": "15:00"
+        }
+        if os.path.exists(settings_file):
+            try:
+                with open(settings_file, "r") as f:
+                    data = json.load(f)
+                    defaults.update(data)
+            except Exception:
+                pass
+        return defaults
+
+    def save_settings(self, settings: dict) -> bool:
+        settings_file = os.path.join(self.data_dir, "app_settings.json")
+        try:
+            with open(settings_file, "w") as f:
+                json.dump(settings, f, indent=4)
+            return True
+        except Exception:
+            return False

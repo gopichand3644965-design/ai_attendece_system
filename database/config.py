@@ -28,16 +28,22 @@ class DatabaseConfig:
 
     @staticmethod
     def get_database_type() -> str:
-        """Get the configured database type."""
+        """Get the configured database type. Environment variables take priority."""
+        env_val = os.environ.get("DATABASE_TYPE")
+        if env_val:
+            return env_val.lower()
         cfg = DatabaseConfig._read_config()
         if "DATABASE_TYPE" in cfg:
             return cfg["DATABASE_TYPE"].lower()
-        return os.environ.get("DATABASE_TYPE", "json").lower()
+        return "json"
 
     @staticmethod
     def get_database_url() -> str:
-        """Get the configured database URL."""
+        """Get the configured database URL. Environment variables take priority."""
+        env_val = os.environ.get("DATABASE_URL")
+        if env_val:
+            return env_val
         cfg = DatabaseConfig._read_config()
         if "DATABASE_URL" in cfg:
             return cfg["DATABASE_URL"]
-        return os.environ.get("DATABASE_URL", "local")
+        return "local"

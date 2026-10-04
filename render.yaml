@@ -5,11 +5,27 @@ services:
     buildCommand: |
       pip install --no-cache-dir -r requirements.txt &&
       pip install --no-cache-dir --no-deps insightface==2.0 onnx &&
-      python -c "from utils.lightweight_deps import install as install_mocks; install_mocks(); import os; os.environ['OMP_NUM_THREADS'] = '1'; from insightface.app import FaceAnalysis; app = FaceAnalysis(name='buffalo_s', root='./model_cache', allowed_modules=['detection', 'recognition']); app.prepare(ctx_id=-1, det_size=(320, 320))"
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --limit-max-requests 1000
+      python -c "
+      from utils.lightweight_deps import install; install();
+      import os; os.environ['OMP_NUM_THREADS'] = '1';
+      from insightface.app import FaceAnalysis;
+      app = FaceAnalysis(name='buffalo_s', root='./model_cache', allowed_modules=['detection', 'recognition'], providers=['CPUExecutionProvider']);
+      app.prepare(ctx_id=-1, det_size=(320, 320));
+      print('Model downloaded and prepared successfully')
+      " &&
+      echo "Cleaning up unused model files to save disk space..." &&
+      rm -f ./model_cache/models/buffalo_s.zip &&
+      rm -f ./model_cache/models/buffalo_s/1k3d68.onnx &&
+      rm -f ./model_cache/models/buffalo_s/2d106det.onnx &&
+      rm -f ./model_cache/models/buffalo_s/genderage.onnx &&
+      echo "Build complete"
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --timeout-keep-alive 120
+    # NOTE: Set DATABASE_URL as a secret environment variable in the Render Dashboard
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.10"
+      - key: DATABASE_TYPE
+        value: postgresql
       - key: FACE_MODEL
         value: buffalo_s
       - key: DET_SIZE

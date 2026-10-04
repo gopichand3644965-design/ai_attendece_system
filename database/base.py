@@ -103,3 +103,16 @@ class DatabaseAdapter(ABC):
     def get_student_attendance(self, student_id: str) -> List[Dict[str, Any]]:
         """Get attendance records for a specific student."""
         pass
+
+    # -- Settings Operations --
+
+    def get_settings(self) -> Dict[str, Any]:
+        """Get application settings. Override for persistent storage."""
+        return {
+            "attendance_start_time": "08:00",
+            "attendance_end_time": "15:00"
+        }
+
+    def save_settings(self, settings: Dict[str, Any]) -> bool:
+        """Save application settings. Override for persistent storage."""
+        return False

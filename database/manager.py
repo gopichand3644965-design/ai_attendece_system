@@ -116,3 +116,11 @@ class DatabaseManager:
 
     def get_student_attendance(self, student_id: str) -> list:
         return self._adapter.get_student_attendance(student_id)
+
+    # --- Proxy Settings Operations ---
+
+    def get_settings(self) -> dict:
+        return self._adapter.get_settings()
+
+    def save_settings(self, settings: dict) -> bool:
+        return self._adapter.save_settings(settings)

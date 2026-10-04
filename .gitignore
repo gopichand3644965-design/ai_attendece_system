@@ -7,3 +7,34 @@ __pycache__/
 *.pyo
 .env
 *.log
+
+# Credentials & runtime config (use env vars in production)
+db_config.json
+settings.json
+
+# Model files — only track the 2 needed .onnx files (~15MB total)
+# This avoids needing AWS CodeBuild to download models at build time
+model_cache/*
+!model_cache/models/
+model_cache/models/*
+!model_cache/models/buffalo_s/
+model_cache/models/buffalo_s/*
+!model_cache/models/buffalo_s/det_500m.onnx
+!model_cache/models/buffalo_s/w600k_mbf.onnx
+*.whl
+
+# Local database files
+database/students.json
+database/attendance.json
+
+# Test files
+dummy_img.jpg
+real_face.jpg
+temp_live_app.js
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Elastic Beanstalk
+.elasticbeanstalk/
