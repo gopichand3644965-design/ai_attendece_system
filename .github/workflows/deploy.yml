@@ -16,12 +16,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (OIDC)
+        id: aws_oidc
+        continue-on-error: true
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::286879406932:role/gopi_attendence_system
           aws-region: eu-north-1
           audience: sts.amazonaws.com
+
+      - name: Configure AWS credentials (fallback secrets)
+        if: steps.aws_oidc.outcome == 'failure' && secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != ''
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+
+      - name: Fail when no AWS auth method is available
+        if: steps.aws_oidc.outcome == 'failure' && (secrets.AWS_ACCESS_KEY_ID == '' || secrets.AWS_SECRET_ACCESS_KEY == '')
+        run: |
+          echo "::error::OIDC role assumption failed and fallback AWS secrets are not configured."
+          exit 1
 
       - name: Verify AWS identity
         run: aws sts get-caller-identity
