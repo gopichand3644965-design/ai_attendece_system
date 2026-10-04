@@ -1,0 +1,4 @@
+# Ensure shell scripts and Procfile always use LF line endings (critical for Linux deployment)
+*.sh text eol=lf
+Procfile text eol=lf
+*.config text eol=lf

@@ -12,11 +12,12 @@ source /var/app/venv/*/bin/activate
 
 # Install insightface without its heavy dependencies (sklearn, skimage, scipy)
 # Our lightweight_deps.py provides numpy-only replacements
-pip install --no-cache-dir --no-deps insightface==2.0 onnx
+pip install --no-cache-dir --no-deps insightface onnx
 
 echo "=== [predeploy] insightface installed successfully ==="
 
 # Verify the model files exist (they should be in the deployment zip)
+# During predeploy, code is in /var/app/staging
 MODEL_DIR="/var/app/staging/model_cache/models/buffalo_s"
 if [ -d "$MODEL_DIR" ]; then
     echo "Model files found in $MODEL_DIR:"
@@ -27,3 +28,4 @@ else
 fi
 
 echo "=== [predeploy] Hook completed ==="
+

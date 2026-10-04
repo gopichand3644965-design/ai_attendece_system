@@ -29,8 +29,13 @@ jobs:
       - name: Verify AWS identity
         run: aws sts get-caller-identity
 
-      - name: Make platform hooks executable
+      - name: Fix line endings and make hooks executable
         run: |
+          # Convert CRLF to LF for all shell scripts and Procfile (Windows -> Linux)
+          sudo apt-get install -y dos2unix
+          find . -name "*.sh" -exec dos2unix {} \;
+          dos2unix Procfile
+          dos2unix .ebextensions/*.config
           chmod +x .platform/hooks/predeploy/*.sh
 
       - name: Zip application (excluding unnecessary files)
