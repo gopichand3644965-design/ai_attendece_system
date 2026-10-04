@@ -4,7 +4,6 @@ APScheduler==3.11.3
 certifi==2026.7.22
 charset-normalizer==3.5.2
 click==8.5.0
-colorama==0.4.6
 dnspython==2.8.0
 fastapi==0.142.2
 flatbuffers==25.12.19
@@ -14,8 +13,8 @@ httpx==0.28.1
 idna==3.20
 joblib==1.6.0
 numpy==2.5.3
-onnxruntime==1.30.0
-opencv-python-headless==4.10.0.84
+onnxruntime>=1.18.0
+opencv-python-headless>=4.8.0
 packaging==26.3
 pillow==12.3.0
 protobuf==7.36.2

@@ -88,6 +88,7 @@ jobs:
             --region eu-north-1
 
       - name: Wait for deployment to complete
+        id: wait_deploy
         run: |
           echo "Waiting for environment to be ready (timeout: 10 minutes)..."
           aws elasticbeanstalk wait environment-updated \
@@ -101,6 +102,32 @@ jobs:
                 --region eu-north-1
               exit 1
             }
+
+      - name: Retrieve EB logs on failure
+        if: failure()
+        run: |
+          echo "=== Requesting instance logs ==="
+          aws elasticbeanstalk request-environment-info \
+            --environment-name AIAttendencesystem-env \
+            --info-type tail \
+            --region eu-north-1
+          sleep 15
+          echo "=== Downloading instance logs ==="
+          aws elasticbeanstalk retrieve-environment-info \
+            --environment-name AIAttendencesystem-env \
+            --info-type tail \
+            --region eu-north-1 \
+            --query 'EnvironmentInfo[*].Message' \
+            --output text | head -500
+
+      - name: Show recent EB events on failure
+        if: failure()
+        run: |
+          echo "=== Recent Elastic Beanstalk events ==="
+          aws elasticbeanstalk describe-events \
+            --environment-name AIAttendencesystem-env \
+            --region eu-north-1 \
+            --max-items 20
 
       - name: Verify deployment health
         run: |
