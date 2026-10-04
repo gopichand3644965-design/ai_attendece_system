@@ -72,7 +72,7 @@ jobs:
             --application-name AI_Attendence_system \
             --version-label "ver-${{ github.sha }}" \
             --source-bundle S3Bucket="gopi-attendence-deployments-286879406932",S3Key="app-${{ github.sha }}.zip" \
-            --region eu-north-1
+            --region eu-north-1 || echo "Version already exists, proceeding with deploy"
 
       - name: Deploy to Elastic Beanstalk
         run: |
