@@ -9,7 +9,7 @@ dnspython==2.8.0
 fastapi==0.142.2
 flatbuffers==25.12.19
 h11==0.16.0
-httpcore==1.0.9  # version 1.0.9 is required for compatibility with httpx 0.28.1
+httpcore==1.0.9 
 httpx==0.28.1
 idna==3.20
 joblib==1.6.0
